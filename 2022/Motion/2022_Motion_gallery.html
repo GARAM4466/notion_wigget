@@ -211,7 +211,7 @@
     class Gallery extends React.Component {
       constructor(props) {
         super(props);
-        this.state = { currentIndex: null };
+        this.state = { currentIndex: null, maxImages: 6 }; // maxImages로 보여줄 이미지 수 설정
         this.closeModal = this.closeModal.bind(this);
         this.findNext = this.findNext.bind(this);
         this.findPrev = this.findPrev.bind(this);
@@ -252,6 +252,9 @@
 
       }
       render() {
+          // maxImages만큼 이미지만 표시
+    const imagesToShow = imgUrls.slice(0, this.state.maxImages);
+        
         return /*#__PURE__*/(
           React.createElement("div", { className: "gallery-container" }, /*#__PURE__*/
             React.createElement("div", { className: "gallery-grid" },
