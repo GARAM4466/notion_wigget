@@ -193,6 +193,23 @@ body {
     .modal-body {
       position: relative;
     }
+
+     /* 전체 화면에서 이미지 크기 조정 */
+  .modal.fullsize img {
+    width: 100vw; /* 화면 너비 100% */
+    height: 100vh; /* 화면 높이 100% */
+    object-fit: contain; /* 이미지 비율 유지하며 화면에 맞춤 */
+    cursor: zoom-out; /* 이미지 축소 아이콘 */
+    background: black; /* 배경 검정색 */
+  }
+
+  /* 전체 화면 모드일 때 모달 배경을 더 어둡게 */
+  .modal.fullsize {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.9); /* 어두운 배경 */
+  }
   </style>
 
 </head>
@@ -275,18 +292,18 @@ body {
     class GalleryModal extends React.Component {
   constructor() {
     super();
-    this.state = { isFullSize: false }; // 👈 이미지가 풀사이즈로 보여지는지 여부를 나타내는 상태
-    this.toggleFullSize = this.toggleFullSize.bind(this); // 상태 변경 메서드
+    this.state = { isFullSize: false };  // 풀사이즈 상태 관리
+    this.toggleFullSize = this.toggleFullSize.bind(this);
   }
 
   toggleFullSize() {
-    // 클릭할 때마다 상태를 변경하여 풀사이즈로 전환
+    // 이미지 클릭 시 isFullSize 상태 변경
     this.setState(prevState => ({ isFullSize: !prevState.isFullSize }));
   }
 
   render() {
     const { closeModal, hasNext, hasPrev, findNext, findPrev, src } = this.props;
-    const { isFullSize } = this.state; // 👈 isFullSize 상태 불러오기
+    const { isFullSize } = this.state; // 풀사이즈 상태 관리
 
     if (!src) return null;
 
@@ -300,7 +317,7 @@ body {
             {hasNext && <a href="#" className="modal-next" onClick={findNext}>›</a>}
             <img 
               src={src} 
-              onClick={this.toggleFullSize}  // 👈 이미지 클릭 시 풀사이즈 토글
+              onClick={this.toggleFullSize}  // 이미지 클릭 시 풀사이즈 토글
             />
           </div>
         </div>
@@ -309,25 +326,79 @@ body {
   }
 }
 
-    /* 전체 화면에서 이미지 크기 조정 */
-.modal.fullsize img {
-  width: 100vw; /* 화면 너비 100% */
-  height: 100vh; /* 화면 높이 100% */
-  object-fit: contain; /* 이미지 비율 유지하며 화면에 맞춤 */
-  cursor: zoom-out; /* 이미지 축소 아이콘 */
-  background: black; /* 배경 검정색 */
+class Gallery extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { currentIndex: 0 };  // 초기 currentIndex 설정 (0으로 시작)
+    this.closeModal = this.closeModal.bind(this);
+    this.findNext = this.findNext.bind(this);
+    this.findPrev = this.findPrev.bind(this);
+    this.renderImageContent = this.renderImageContent.bind(this);
+  }
+
+  renderImageContent(src, index) {
+    return (
+      <div onClick={e => this.openModal(e, index)} key={src}>
+        <img src={src} />
+      </div>
+    );
+  }
+
+  openModal(e, index) {
+    this.setState({ currentIndex: index });
+  }
+
+  closeModal(e) {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState({ currentIndex: null });
+  }
+
+  findPrev(e) {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState(prevState => ({
+      currentIndex: prevState.currentIndex - 1
+    }));
+  }
+
+  findNext(e) {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState(prevState => ({
+      currentIndex: prevState.currentIndex + 1
+    }));
+  }
+
+  render() {
+    return (
+      <div className="gallery-container">
+        <div className="gallery-grid">
+          {imgUrls.map(this.renderImageContent)}
+        </div>
+
+        <GalleryModal
+          closeModal={this.closeModal}
+          findPrev={this.findPrev}
+          findNext={this.findNext}
+          hasPrev={this.state.currentIndex > 0}
+          hasNext={this.state.currentIndex + 1 < imgUrls.length}
+          src={imgUrls[this.state.currentIndex]}
+        />
+      </div>
+    );
+  }
 }
 
-/* 전체 화면 모드일 때 모달 배경을 더 어둡게 */
-.modal.fullsize {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.9); /* 어두운 배경 */
-}
+const imgUrls = [
+  '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg', '6.jpeg', 
+  '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg', '11.jpeg', '12.jpeg'
+];
 
-
-    ReactDOM.render( /*#__PURE__*/React.createElement(Gallery, null), document.querySelector('.gallery-container'));
+ReactDOM.render(<Gallery />, document.querySelector('.gallery-container'));
   </script>
 
 </body>
