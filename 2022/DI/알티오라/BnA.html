@@ -7,20 +7,28 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        
+
         /* 탭 버튼 스타일 */
         .tabs { display: flex; justify-content: center; margin-bottom: 20px; }
         .tab { cursor: pointer; padding: 10px 15px; margin: 0 5px; border-radius: 10px; background: #ddd; transition: 0.3s; }
         .tab.active { background: #555; color: white; }
 
-        /* 이미지 비교 슬라이더 */
+        /* Before & After 슬라이더 */
         .container { position: relative; width: 80%; max-width: 600px; height: 400px; margin: auto; overflow: hidden; }
         .image-container { position: relative; width: 100%; height: 100%; }
         .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
 
-        /* After 이미지 (왼쪽에서 오른쪽으로 이동) */
-        .after-image { position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden; }
-        .after-image img { width: 100%; height: 100%; object-fit: cover; }
+        /* After 이미지 (Before 위에 덮이는 방식) */
+        .after-image { 
+            position: absolute; 
+            top: 0; left: 0; width: 50%; height: 100%; 
+            overflow: hidden; 
+        }
+        .after-image img { 
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            object-fit: cover; 
+        }
 
         /* 슬라이더 바 (세로 바) */
         .slider-bar { 
@@ -68,8 +76,11 @@
         const afterImage = document.querySelector(".after-image");
         let isDragging = false;
 
+        // 마우스 클릭하면 드래그 시작
         slider.addEventListener("mousedown", () => isDragging = true);
         window.addEventListener("mouseup", () => isDragging = false);
+
+        // 마우스 움직일 때 바 위치 조정
         window.addEventListener("mousemove", (e) => {
             if (!isDragging) return;
             let container = document.querySelector(".container");
@@ -78,8 +89,10 @@
             let percentage = (offsetX / rect.width) * 100;
             if (percentage < 0) percentage = 0;
             if (percentage > 100) percentage = 100;
+            
+            // 바 위치 조정
             slider.style.left = percentage + "%";
-            afterImage.style.width = percentage + "%";
+            afterImage.style.width = percentage + "%";  // After 이미지가 덮이도록 설정
         });
 
         // 여러 개의 Before & After 이미지를 탭 버튼으로 변경
