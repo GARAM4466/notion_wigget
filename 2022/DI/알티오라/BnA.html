@@ -7,24 +7,55 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        .container { position: relative; width: 80%; max-width: 600px; margin: auto; }
-        .image-container { position: relative; width: 100%; overflow: hidden; }
-        .image-container img { width: 100%; display: block; }
-        .after-image { position: absolute; top: 0; left: 0; width: 50%; overflow: hidden; }
-        .after-image img { width: 100%; }
-        .slider-bar { position: absolute; top: 0; left: 50%; width: 4px; height: 100%; background: #fff; cursor: ew-resize; transform: translateX(-50%); }
-        .slider-button { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); border: 2px solid #000; }
+        
+        /* 탭 버튼 스타일 */
+        .tabs { display: flex; justify-content: center; margin-bottom: 20px; }
+        .tab { cursor: pointer; padding: 10px 15px; margin: 0 5px; border-radius: 10px; background: #ddd; transition: 0.3s; }
+        .tab.active { background: #555; color: white; }
+
+        /* 이미지 비교 슬라이더 */
+        .container { position: relative; width: 80%; max-width: 600px; height: 400px; margin: auto; overflow: hidden; }
+        .image-container { position: relative; width: 100%; height: 100%; }
+        .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
+
+        /* After 이미지 (왼쪽에서 오른쪽으로 이동) */
+        .after-image { position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden; }
+        .after-image img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 슬라이더 바 (세로 바) */
+        .slider-bar { 
+            position: absolute; 
+            top: 0; left: 50%; width: 4px; height: 100%; 
+            background: red; cursor: ew-resize; 
+            transform: translateX(-50%);
+        }
+        .slider-button { 
+            position: absolute; 
+            top: 50%; left: 50%; 
+            width: 25px; height: 25px; 
+            background: white; border-radius: 50%; 
+            transform: translate(-50%, -50%); 
+            border: 3px solid black; 
+        }
     </style>
 </head>
 <body>
 
     <h2>Drag to Compare Before & After</h2>
 
+    <!-- 탭 버튼 -->
+    <div class="tabs">
+        <div class="tab active" data-index="0">1</div>
+        <div class="tab" data-index="1">2</div>
+        <div class="tab" data-index="2">3</div>
+    </div>
+
+    <!-- Before & After 슬라이더 -->
     <div class="container">
         <div class="image-container">
-            <img src="before.jpg" alt="Before">
+            <img id="before-img" src="before1.jpg" alt="Before">
             <div class="after-image">
-                <img src="after.jpg" alt="After">
+                <img id="after-img" src="after1.jpg" alt="After">
             </div>
             <div class="slider-bar">
                 <div class="slider-button"></div>
@@ -49,6 +80,31 @@
             if (percentage > 100) percentage = 100;
             slider.style.left = percentage + "%";
             afterImage.style.width = percentage + "%";
+        });
+
+        // 여러 개의 Before & After 이미지를 탭 버튼으로 변경
+        const beforeImg = document.getElementById("before-img");
+        const afterImg = document.getElementById("after-img");
+        const tabs = document.querySelectorAll(".tab");
+
+        const imageSets = [
+            { before: "before1.jpg", after: "after1.jpg" },
+            { before: "before2.jpg", after: "after2.jpg" },
+            { before: "before3.jpg", after: "after3.jpg" }
+        ];
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", function() {
+                let index = this.getAttribute("data-index");
+
+                // 이미지 변경
+                beforeImg.src = imageSets[index].before;
+                afterImg.src = imageSets[index].after;
+
+                // 탭 스타일 업데이트
+                tabs.forEach(t => t.classList.remove("active"));
+                this.classList.add("active");
+            });
         });
     </script>
 
