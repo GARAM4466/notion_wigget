@@ -6,26 +6,22 @@
     <title>Before & After Slider</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; text-align: center; padding: 20px; }
 
-        /* 탭 버튼 스타일 */
         .tabs { display: flex; justify-content: center; margin-bottom: 20px; }
-        .tab { cursor: pointer; padding: 10px 15px; margin: 0 5px; border-radius: 10px; background: #ddd; transition: 0.3s; }
-        .tab.active { background: #555; color: white; }
+        .tab { cursor: pointer; padding: 10px 15px; margin: 0 5px; border-radius: 10px; background: #bbb; transition: 0.3s; font-weight: bold; }
+        .tab.active { background: #333; color: white; }
 
-        /* Before & After 슬라이더 */
-        .container { position: relative; width: 80%; max-width: 600px; height: 400px; margin: auto; overflow: hidden; }
+        .container { position: relative; width: 80%; max-width: 700px; height: 400px; margin: auto; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .image-container { position: relative; width: 100%; height: 100%; }
         .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
 
-        /* After 이미지 (Before와 동일한 위치에 시작, 바를 따라 덮어짐) */
         .after-image { 
             position: absolute; 
             top: 0; left: 0; 
-            width: 0%; 
+            width: 50%; 
             height: 100%; 
-            overflow: hidden; 
-            transition: width 0.3s ease; /* 부드럽게 덮이는 애니메이션 */
+            overflow: hidden;
         }
         .after-image img { 
             position: absolute; 
@@ -34,35 +30,31 @@
             object-fit: cover; 
         }
 
-        /* 슬라이더 바 (세로 바) */
         .slider-bar { 
             position: absolute; 
-            top: 0; left: 50%; width: 4px; height: 100%; 
-            background: red; cursor: ew-resize; 
+            top: 0; left: 50%; width: 6px; height: 100%; 
+            background: #fff; cursor: ew-resize; 
             transform: translateX(-50%);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
         }
         .slider-button { 
             position: absolute; 
             top: 50%; left: 50%; 
-            width: 25px; height: 25px; 
+            width: 30px; height: 30px; 
             background: white; border-radius: 50%; 
             transform: translate(-50%, -50%); 
-            border: 3px solid black; 
+            border: 4px solid black; 
         }
     </style>
 </head>
 <body>
 
-    <h2>Drag to Compare Before & After</h2>
-
-    <!-- 탭 버튼 -->
     <div class="tabs">
         <div class="tab active" data-index="0">1</div>
         <div class="tab" data-index="1">2</div>
         <div class="tab" data-index="2">3</div>
     </div>
 
-    <!-- Before & After 슬라이더 -->
     <div class="container">
         <div class="image-container">
             <img id="before-img" src="before1.jpg" alt="Before">
@@ -80,12 +72,10 @@
         const afterImage = document.querySelector(".after-image");
         let isDragging = false;
 
-        // 마우스 클릭하면 드래그 시작
-        slider.addEventListener("mousedown", () => isDragging = true);
-        window.addEventListener("mouseup", () => isDragging = false);
+        slider.addEventListener("pointerdown", () => isDragging = true);
+        window.addEventListener("pointerup", () => isDragging = false);
 
-        // 마우스 움직일 때 바 위치 조정
-        window.addEventListener("mousemove", (e) => {
+        window.addEventListener("pointermove", (e) => {
             if (!isDragging) return;
             let container = document.querySelector(".container");
             let rect = container.getBoundingClientRect();
@@ -94,16 +84,14 @@
             if (percentage < 0) percentage = 0;
             if (percentage > 100) percentage = 100;
             
-            // 바 위치 조정
             slider.style.left = percentage + "%";
-            afterImage.style.width = percentage + "%";  // After 이미지가 바를 따라 덮어짐
+            afterImage.style.width = percentage + "%";
         });
 
-        // 여러 개의 Before & After 이미지를 탭 버튼으로 변경
         const beforeImg = document.getElementById("before-img");
         const afterImg = document.getElementById("after-img");
         const tabs = document.querySelectorAll(".tab");
-
+        
         const imageSets = [
             { before: "before1.jpg", after: "after1.jpg" },
             { before: "before2.jpg", after: "after2.jpg" },
@@ -113,18 +101,13 @@
         tabs.forEach(tab => {
             tab.addEventListener("click", function() {
                 let index = this.getAttribute("data-index");
-
-                // 이미지 변경
                 beforeImg.src = imageSets[index].before;
                 afterImg.src = imageSets[index].after;
-
-                // 탭 스타일 업데이트
                 tabs.forEach(t => t.classList.remove("active"));
                 this.classList.add("active");
-
-                // 초기화
+                
                 slider.style.left = "50%";
-                afterImage.style.width = "0%";
+                afterImage.style.width = "50%";
             });
         });
     </script>
