@@ -6,20 +6,9 @@
     <title>Before & After Slider</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: transparent; text-align: center; padding: 20px; }
+        body { font-family: Arial, sans-serif; background: transparent; text-align: center; padding: 0px; }
 
-        .wrapper {
-            display: flex; 
-            align-items: center; /* 세로 중앙 정렬 */
-            justify-content: center; /* 가로 중앙 정렬 */
-            gap: 20px; /* 이미지와 버튼 사이 간격 */
-        }
-
-        .tabs { 
-            display: flex;
-            flex-direction: column; /* 세로 정렬 */
-            gap: 10px; /* 버튼 사이 간격 */
-        }
+        .tabs { display: flex; justify-content: center; margin-bottom: 20px; gap: 10px; }
         .tab { 
             cursor: pointer; 
             width: 80px; 
@@ -36,33 +25,13 @@
         }
         .tab.active { border-color: #333; }
 
-        .container { 
-            position: relative; 
-            width: 100%; 
-            max-width: 800px; /* 사진 크기 */
-            height: auto; 
-            margin: auto; 
-            border-radius: 15px; 
-            overflow: hidden; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
-        }
-        .image-container { 
-            position: relative; 
-            width: 100%; 
-            height: 100%; 
-        }
-        .image-container img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            display: block; 
-            user-select: none; 
-        }
+        .container { position: relative; width: 100%; max-width: 1000px; height: auto; margin: auto; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .image-container { position: relative; width: 100%; height: 100%; }
+        .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
 
         .after-image { 
             position: absolute; 
-            top: 0; 
-            left: 0; 
+            top: 0; left: 0; 
             width: 100%;
             height: 100%;
             clip-path: inset(0 50% 0 0);
@@ -71,17 +40,14 @@
         .after-image img { 
             position: absolute; 
             top: 0; left: 0; 
-            width: 100%; 
-            height: 100%; 
+            width: 100%; height: 100%; 
             object-fit: cover; 
         }
 
         .slider-bar { 
             position: absolute; 
-            top: 0; left: 50%; 
-            width: 2px; height: 100%; 
-            background: #fff; 
-            cursor: ew-resize; 
+            top: 0; left: 50%; width: 2px; height: 100%; 
+            background: #fff; cursor: ew-resize; 
             transform: translateX(-50%);
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
         }
@@ -97,25 +63,21 @@
 </head>
 <body>
 
-    <div class="wrapper">
-        <!-- 이미지 슬라이드 -->
-        <div class="container">
-            <div class="image-container">
-                <img id="before-img" src="before1.jpg" alt="Before">
-                <div class="after-image" id="after-container">
-                    <img id="after-img" src="after1.jpg" alt="After">
-                </div>
-                <div class="slider-bar">
-                    <div class="slider-button"></div>
-                </div>
-            </div>
-        </div>
+    <div class="tabs">
+        <div class="tab active" data-index="0"><img src="before1.jpg" alt="Thumbnail"></div>
+        <div class="tab" data-index="1"><img src="before2.jpg" alt="Thumbnail"></div>
+        <div class="tab" data-index="2"><img src="before3.jpg" alt="Thumbnail"></div>
+    </div>
 
-        <!-- 썸네일 버튼 -->
-        <div class="tabs">
-            <div class="tab active" data-index="0"><img src="before1.jpg" alt="Thumbnail"></div>
-            <div class="tab" data-index="1"><img src="before2.jpg" alt="Thumbnail"></div>
-            <div class="tab" data-index="2"><img src="before3.jpg" alt="Thumbnail"></div>
+    <div class="container">
+        <div class="image-container">
+            <img id="before-img" src="before1.jpg" alt="Before">
+            <div class="after-image" id="after-container">
+                <img id="after-img" src="after1.jpg" alt="After">
+            </div>
+            <div class="slider-bar">
+                <div class="slider-button"></div>
+            </div>
         </div>
     </div>
 
