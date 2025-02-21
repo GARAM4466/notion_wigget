@@ -73,9 +73,9 @@
 
     <div class="container">
         <div class="image-container">
-            <img id="before-img" src="before1.jpg" alt="Before">
+            <img id="before-img" src="before1.png" alt="Before">
             <div class="after-image" id="after-container">
-                <img id="after-img" src="after1.jpg" alt="After">
+                <img id="after-img" src="after1.png" alt="After">
             </div>
             <div class="slider-bar" id="slider-bar">
                 <div class="slider-button"></div>
@@ -109,8 +109,8 @@
         });
 
         const imageSets = Array.from({ length: maxImages }, (_, i) => ({
-            before: `before${i + 1}.jpg`,
-            after: `after${i + 1}.jpg`
+            before: `before${i + 1}.png`,
+            after: `after${i + 1}.png`
         }));
 
         function createTabs(count) {
