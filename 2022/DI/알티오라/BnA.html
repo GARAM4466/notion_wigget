@@ -63,11 +63,7 @@
 </head>
 <body>
 
-    <div class="tabs">
-        <div class="tab active" data-index="0"><img src="before1.jpg" alt="Thumbnail"></div>
-        <div class="tab" data-index="1"><img src="before2.jpg" alt="Thumbnail"></div>
-        <div class="tab" data-index="2"><img src="before3.jpg" alt="Thumbnail"></div>
-    </div>
+    <div class="tabs" id="tabs-container"></div>
 
     <div class="container">
         <div class="image-container">
@@ -88,6 +84,7 @@
 
         slider.addEventListener("pointerdown", () => isDragging = true);
         window.addEventListener("pointerup", () => isDragging = false);
+        window.addEventListener("pointerleave", () => isDragging = false);
 
         window.addEventListener("pointermove", (e) => {
             if (!isDragging) return;
@@ -104,26 +101,49 @@
 
         const beforeImg = document.getElementById("before-img");
         const afterImg = document.getElementById("after-img");
-        const tabs = document.querySelectorAll(".tab");
-        
+        const tabsContainer = document.getElementById("tabs-container");
+
         const imageSets = [
             { before: "before1.jpg", after: "after1.jpg" },
-            { before: "before2.jpg", after: "after2.jpg" },
-            { before: "before3.jpg", after: "after3.jpg" }
+            { before: "before2.jpg", after: "after2.jpg" }
         ];
 
-        tabs.forEach(tab => {
-            tab.addEventListener("click", function() {
-                let index = this.getAttribute("data-index");
-                beforeImg.src = imageSets[index].before;
-                afterImg.src = imageSets[index].after;
-                tabs.forEach(t => t.classList.remove("active"));
-                this.classList.add("active");
-                
-                slider.style.left = "50%";
-                afterContainer.style.clipPath = "inset(0 50% 0 0)";
+        function createTabs() {
+            tabsContainer.innerHTML = "";
+            imageSets.forEach((set, index) => {
+                const tab = document.createElement("div");
+                tab.classList.add("tab");
+                if (index === 0) tab.classList.add("active");
+                tab.setAttribute("data-index", index);
+
+                const img = document.createElement("img");
+                img.src = set.before;
+                img.alt = "Thumbnail";
+
+                tab.appendChild(img);
+                tabsContainer.appendChild(tab);
             });
-        });
+            addTabClickEvent();
+        }
+
+        function addTabClickEvent() {
+            const tabs = document.querySelectorAll(".tab");
+            tabs.forEach(tab => {
+                tab.addEventListener("click", function () {
+                    let index = this.getAttribute("data-index");
+                    beforeImg.src = imageSets[index].before;
+                    afterImg.src = imageSets[index].after;
+
+                    tabs.forEach(t => t.classList.remove("active"));
+                    this.classList.add("active");
+
+                    slider.style.left = "50%";
+                    afterContainer.style.clipPath = "inset(0 50% 0 0)";
+                });
+            });
+        }
+
+        createTabs();
     </script>
 
 </body>
