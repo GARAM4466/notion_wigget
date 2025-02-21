@@ -17,6 +17,7 @@
             overflow: hidden; 
             border: 3px solid transparent;
             transition: 0.3s; 
+            display: none;
         }
         .tab img {
             width: 100%;
@@ -63,6 +64,11 @@
 </head>
 <body>
 
+    <script>
+        const maxImages = 8; // 최대 이미지 개수
+        const selectedImageCount = 4; // HTML에서 설정한 썸네일 개수 (수동 조정 가능)
+    </script>
+    
     <div class="tabs" id="tabs-container"></div>
 
     <div class="container">
@@ -78,43 +84,23 @@
     </div>
 
     <script>
-        const slider = document.querySelector(".slider-bar");
-        const afterContainer = document.getElementById("after-container");
-        let isDragging = false;
-
-        slider.addEventListener("pointerdown", () => isDragging = true);
-        window.addEventListener("pointerup", () => isDragging = false);
-        window.addEventListener("pointerleave", () => isDragging = false);
-
-        window.addEventListener("pointermove", (e) => {
-            if (!isDragging) return;
-            let container = document.querySelector(".container");
-            let rect = container.getBoundingClientRect();
-            let offsetX = e.clientX - rect.left;
-            let percentage = (offsetX / rect.width) * 100;
-            if (percentage < 0) percentage = 0;
-            if (percentage > 100) percentage = 100;
-            
-            slider.style.left = percentage + "%";
-            afterContainer.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
-        });
-
         const beforeImg = document.getElementById("before-img");
         const afterImg = document.getElementById("after-img");
         const tabsContainer = document.getElementById("tabs-container");
 
-        const imageSets = [
-            { before: "before1.jpg", after: "after1.jpg" },
-            { before: "before2.jpg", after: "after2.jpg" }
-        ];
+        const imageSets = Array.from({ length: maxImages }, (_, i) => ({
+            before: `before${i + 1}.jpg`,
+            after: `after${i + 1}.jpg`
+        }));
 
-        function createTabs() {
+        function createTabs(count) {
             tabsContainer.innerHTML = "";
-            imageSets.forEach((set, index) => {
+            imageSets.slice(0, count).forEach((set, index) => {
                 const tab = document.createElement("div");
                 tab.classList.add("tab");
                 if (index === 0) tab.classList.add("active");
                 tab.setAttribute("data-index", index);
+                tab.style.display = "block";
 
                 const img = document.createElement("img");
                 img.src = set.before;
@@ -136,14 +122,11 @@
 
                     tabs.forEach(t => t.classList.remove("active"));
                     this.classList.add("active");
-
-                    slider.style.left = "50%";
-                    afterContainer.style.clipPath = "inset(0 50% 0 0)";
                 });
             });
         }
 
-        createTabs();
+        createTabs(selectedImageCount);
     </script>
 
 </body>
