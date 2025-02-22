@@ -8,7 +8,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: transparent; text-align: center; padding: 0px; }
 
-        .tabs { display: flex; justify-content: center; margin-bottom: 20px; gap: 10px; }
+        .tabs { 
+            display: flex; 
+            justify-content: flex-start; 
+            gap: 10px; 
+            overflow-x: auto; 
+            padding: 10px; 
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+
         .tab { 
             cursor: pointer; 
             width: 80px; 
@@ -18,6 +28,7 @@
             border: 3px solid transparent;
             transition: 0.3s; 
             display: none;
+            flex-shrink: 0;
         }
         .tab img {
             width: 100%;
@@ -55,7 +66,7 @@
         .slider-button { 
             position: absolute; 
             top: 50%; left: 50%; 
-            width: 15px; height: 15px; 
+            width: 20px; height: 20px; 
             background: white; border-radius: 50%; 
             transform: translate(-50%, -50%); 
             border: none; 
@@ -65,8 +76,8 @@
 <body>
 
     <script>
-        const maxImages = 8; // 최대 이미지 개수
-        const selectedImageCount = 4; // HTML에서 설정한 썸네일 개수 (수동 조정 가능)
+        const maxImages = 8; 
+        const selectedImageCount = 4; 
     </script>
     
     <div class="tabs" id="tabs-container"></div>
@@ -89,24 +100,32 @@
         const tabsContainer = document.getElementById("tabs-container");
         const slider = document.getElementById("slider-bar");
         const afterContainer = document.getElementById("after-container");
+
         let isDragging = false;
 
-        slider.addEventListener("pointerdown", () => isDragging = true);
-        window.addEventListener("pointerup", () => isDragging = false);
-        window.addEventListener("pointerleave", () => isDragging = false);
-        
-        window.addEventListener("pointermove", (e) => {
+        function handleSliderMove(e) {
             if (!isDragging) return;
-            let container = document.querySelector(".container");
-            let rect = container.getBoundingClientRect();
-            let offsetX = e.clientX - rect.left;
-            let percentage = (offsetX / rect.width) * 100;
-            if (percentage < 0) percentage = 0;
-            if (percentage > 100) percentage = 100;
-            
-            slider.style.left = percentage + "%";
-            afterContainer.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
-        });
+            requestAnimationFrame(() => {
+                let rect = document.querySelector(".container").getBoundingClientRect();
+                let offsetX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                let percentage = (offsetX / rect.width) * 100;
+                percentage = Math.max(0, Math.min(100, percentage));
+
+                slider.style.left = percentage + "%";
+                afterContainer.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+            });
+        }
+
+        function startDrag() { isDragging = true; }
+        function stopDrag() { isDragging = false; }
+
+        slider.addEventListener("pointerdown", startDrag);
+        window.addEventListener("pointerup", stopDrag);
+        window.addEventListener("pointermove", handleSliderMove);
+        
+        slider.addEventListener("touchstart", startDrag);
+        window.addEventListener("touchend", stopDrag);
+        window.addEventListener("touchmove", handleSliderMove);
 
         const imageSets = Array.from({ length: maxImages }, (_, i) => ({
             before: `before${i + 1}.png`,
