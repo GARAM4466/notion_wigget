@@ -38,8 +38,8 @@
         .tab.active { border-color: #fff; }
 
         .container { position: relative; width: 100%; max-width: 1000px; height: auto; margin: auto; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .image-container { position: relative; width: 100%; height: 100%; user-select: none; }
-        .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; pointer-events: none; }
+        .image-container { position: relative; width: 100%; height: 100%; }
+        .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
 
         .label {
             position: absolute;
@@ -51,8 +51,6 @@
             font-size: 16px;
             border: 2px solid white;
             border-radius: 5px;
-            user-select: none;
-            pointer-events: none;
         }
         .before-label { right: 10px; }
         .after-label { left: 10px; }
@@ -99,10 +97,10 @@
 
     <div class="container">
         <div class="image-container">
-            <img id="before-img" src="before1.png" alt="Before" loading="eager">
+            <img id="before-img" src="before1.png" alt="Before">
             <div class="label before-label">Before</div>
             <div class="after-image" id="after-container">
-                <img id="after-img" src="after1.png" alt="After" loading="eager">
+                <img id="after-img" src="after1.png" alt="After">
                 <div class="label after-label">After</div>
             </div>
             <div class="slider-bar" id="slider-bar">
@@ -110,5 +108,79 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const beforeImg = document.getElementById("before-img");
+        const afterImg = document.getElementById("after-img");
+        const tabsContainer = document.getElementById("tabs-container");
+        const slider = document.getElementById("slider-bar");
+        const afterContainer = document.getElementById("after-container");
+
+        let isDragging = false;
+
+        function handleSliderMove(e) {
+            if (!isDragging) return;
+            requestAnimationFrame(() => {
+                let rect = document.querySelector(".container").getBoundingClientRect();
+                let offsetX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                let percentage = (offsetX / rect.width) * 100;
+                percentage = Math.max(0, Math.min(100, percentage));
+
+                slider.style.left = percentage + "%";
+                afterContainer.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+            });
+        }
+
+        function startDrag() { isDragging = true; }
+        function stopDrag() { isDragging = false; }
+
+        slider.addEventListener("pointerdown", startDrag);
+        window.addEventListener("pointerup", stopDrag);
+        window.addEventListener("pointermove", handleSliderMove);
+        
+        slider.addEventListener("touchstart", startDrag);
+        window.addEventListener("touchend", stopDrag);
+        window.addEventListener("touchmove", handleSliderMove);
+
+        const imageSets = Array.from({ length: maxImages }, (_, i) => ({
+            before: `before${i + 1}.png`,
+            after: `after${i + 1}.png`
+        }));
+
+        function createTabs(count) {
+            tabsContainer.innerHTML = "";
+            imageSets.slice(0, count).forEach((set, index) => {
+                const tab = document.createElement("div");
+                tab.classList.add("tab");
+                if (index === 0) tab.classList.add("active");
+                tab.setAttribute("data-index", index);
+                tab.style.display = "block";
+
+                const img = document.createElement("img");
+                img.src = set.before;
+                img.alt = "Thumbnail";
+
+                tab.appendChild(img);
+                tabsContainer.appendChild(tab);
+            });
+            addTabClickEvent();
+        }
+
+        function addTabClickEvent() {
+            const tabs = document.querySelectorAll(".tab");
+            tabs.forEach(tab => {
+                tab.addEventListener("click", function () {
+                    let index = this.getAttribute("data-index");
+                    beforeImg.src = imageSets[index].before;
+                    afterImg.src = imageSets[index].after;
+
+                    tabs.forEach(t => t.classList.remove("active"));
+                    this.classList.add("active");
+                });
+            });
+        }
+
+        createTabs(selectedImageCount);
+    </script>
 </body>
 </html>
