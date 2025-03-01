@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Before & After Slider</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: transparent; text-align: center; }
+        .tabs { display: flex; gap: 10px; overflow-x: auto; padding: 10px; white-space: nowrap; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab { cursor: pointer; width: 80px; height: 45px; border-radius: 5px; border: 3px solid transparent; transition: 0.2s; flex-shrink: 0; }
+        .tab img { width: 100%; height: 100%; object-fit: cover; }
+        .tab.active { border-color: #fff; }
+        .container { position: relative; width: 100%; max-width: 1000px; margin: auto; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .image-container { position: relative; }
+        .image-container img { width: 100%; display: block; user-select: none; }
+        .label { position: absolute; top: 10px; padding: 5px 10px; background: rgba(255, 255, 255, 0.5); border: 2px solid white; border-radius: 5px; user-select: none; }
+        .before-label { right: 10px; }
+        .after-label { left: 10px; }
+        .after-image { position: absolute; top: 0; left: 0; width: 100%; clip-path: inset(0 50% 0 0); pointer-events: none; }
+        .slider-bar { position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #fff; cursor: ew-resize; transform: translateX(-50%); box-shadow: 0 0 8px rgba(0, 0, 0, 0.5); }
+        .slider-button { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; background: white; border-radius: 50%; transform: translate(-50%, -50%); border: none; }
+    </style>
+</head>
+<body>
+    <div class="tabs" id="tabs-container"></div>
+    <div class="container">
+        <div class="image-container">
+            <img id="before-img" src="before1.png" alt="Before">
+            <div class="label before-label">Before</div>
+            <div class="after-image" id="after-container">
+                <img id="after-img" src="after1.png" alt="After">
+                <div class="label after-label">After</div>
+            </div>
+            <div class="slider-bar" id="slider-bar">
+                <div class="slider-button"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const maxImages = 8;
+        const selectedImageCount = 6;
+        const beforeImg = document.getElementById("before-img");
+        const afterImg = document.getElementById("after-img");
+        const tabsContainer = document.getElementById("tabs-container");
+        const slider = document.getElementById("slider-bar");
+        const afterContainer = document.getElementById("after-container");
+
+        let isDragging = false;
+
+        function handleSliderMove(e) {
+            if (!isDragging) return;
+            requestAnimationFrame(() => {
+                let rect = document.querySelector(".container").getBoundingClientRect();
+                let percentage = ((e.clientX - rect.left) / rect.width) * 100;
+                percentage = Math.max(0, Math.min(100, percentage));
+                slider.style.left = percentage + "%";
+                afterContainer.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+            });
+        }
+
+        function startDrag() { isDragging = true; }
+        function stopDrag() { isDragging = false; }
+
+        slider.addEventListener("pointerdown", startDrag);
+        window.addEventListener("pointerup", stopDrag);
+        window.addEventListener("pointermove", handleSliderMove);
+        
+        const imageSets = Array.from({ length: maxImages }, (_, i) => ({
+            before: `before${i + 1}.png`,
+            after: `after${i + 1}.png`
+        }));
+        
+        function createTabs(count) {
+            let fragment = document.createDocumentFragment();
+            imageSets.slice(0, count).forEach((set, index) => {
+                const tab = document.createElement("div");
+                tab.classList.add("tab");
+                if (index === 0) tab.classList.add("active");
+                tab.dataset.index = index;
+                
+                const img = new Image();
+                img.src = set.before;
+                img.alt = "Thumbnail";
+                tab.appendChild(img);
+                fragment.appendChild(tab);
+            });
+            tabsContainer.appendChild(fragment);
+            addTabClickEvent();
+        }
+
+        function addTabClickEvent() {
+            tabsContainer.addEventListener("click", function (e) {
+                if (e.target.closest(".tab")) {
+                    let tab = e.target.closest(".tab");
+                    let index = tab.dataset.index;
+                    beforeImg.src = imageSets[index].before;
+                    afterImg.src = imageSets[index].after;
+                    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+                    tab.classList.add("active");
+                }
+            });
+        }
+
+        function preloadImages() {
+            imageSets.forEach(set => {
+                let img1 = new Image();
+                let img2 = new Image();
+                img1.src = set.before;
+                img2.src = set.after;
+            });
+        }
+        
+        preloadImages();
+        createTabs(selectedImageCount);
+    </script>
+</body>
+</html>
